@@ -1,0 +1,1 @@
+python e:\lang\main.py

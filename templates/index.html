@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 引入 Bootstrap -->
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="http://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <style>
+        .container {
+            padding-top: 5px;
+            margin-right: 50px;
+            margin-left: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 模态框1（Modal） -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop=”static”>
+        <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            模态框（Modal）标题
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <!-- 进度条 -->
+                        <div class="progress progress-striped">
+                            <div class="progress-bar progress-bar-info" role="progressbar"
+                                aria-valuenow="90" aria-valuemin="0" aria-valuemax="100" 	
+                                style="width:0%" id="myprogress">
+                                <span class="sr-only">30% 完成（信息）</span>
+                            </div>
+                        </div><!-- progress-->
+                        <p id="show_info"></p>
+                    </div><!--modal-body-->
+                    <div class="modal-footer">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default" id="product">
+                                生成MP3
+                            </button>
+                            <button type="button" class="btn btn-default" id="openexcel">
+                                打开Excel文件
+                            </button>
+                            <button type="button" class="btn btn-default" id="openmp3dir">
+                                打开音频文件夹
+                           
+                            </div><!-- /.btn-group -->
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                                删除
+                                <span class="caret"></span>
+                                <span class="sr-only">切换下拉菜单</span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="./delectmp3">删除MP3文件</a></li>
+                                <li><a href="#">删除Excel和MP3文件</a></li>
+                                <li class="divider"></li>
+                                <li><a href="#">......</a></li>
+                            </ul>
+                            
+                            <button type="button" class="btn btn-primary">
+                                提交更改
+                            </button>
+                        </div>
+                    </div>
+                </div><!-- /.modal-content -->
+        </div><!-- /.modal-dalog -->
+    </div><!-- /.modal -->
+    <!-- 模态框2（Modal） 新建功能-->
+    <div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            新建
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <div style="margin: auto">
+                        <span class="label label-default">文件名:</span>
+                        <input type="text" style="width: 400px;height: 25px;" id="newfileName">
+                        </div>
+                    </div><!--modal-body-->
+                    <div class="modal-footer">
+                        <div class="btn-group">
+                      
+                            <button type="button" class="btn btn-primary" onclick="newfile()">
+                                新建
+                            </button>
+                        </div>
+                    </div>
+                </div><!-- /.modal-content -->
+        </div><!-- /.modal-dalog -->
+    </div><!-- /.modal2 -->
+
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">好好学习,天天向上</a>
+        </div>
+        <ul class="nav navbar-nav">
+            <li>
+                <a href="#">首页</a>
+            </li>
+            <li>
+                <a href="#">更新计划</a>
+            </li>
+            <li>
+                <a href="#">关于</a>
+            </li>
+        </ul>
+        <div>
+        </div>
+    </nav>
+    <div class="container">
+        
+        <div class="row">
+            <div class="col-xs-3 ">
+                <h3>
+                    <b> 公告栏：</b>
+                    </h4>
+                    <p style="font-size: 17px">
+                        至6月20日完成单词书第二遍
+                        <br> 每日单词必须默写在单词本上
+                        <br> 每日完成任务后再网页上签到
+                        <br>
+                        <br> 坚持！
+                        <br> 不抛弃，不放弃！
+                        <br>
+                    </p>
+                    
+                    <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+                        签到       
+                    </button>
+            </div>
+            <div class="col-xs-9">
+                <table class="table  table-hover">
+                    <tr style="background-color: rgb(245, 245, 245)">
+                        <td>文件名
+                            <button type="button" class="btn btn-default btn-sm" onclick="frame2(this)">
+                                <span class="glyphicon glyphicon-plus"></span>
+                                新建
+                            </button>
+                        </td>
+                        <td>存在音频</td>
+                        <td>创建日期</td>
+                    </tr>
+                    {% for fileName in fileInfo%}
+                    <tr>
+                        <td onclick="frame1(this)">{{ fileName }}</td>
+                        <td>
+                            {% if fileInfo[fileName] == 1 %}
+                            <span class="glyphicon glyphicon-ok" style="background-color: greenyellow"></span>Yes</td>
+                            {% else %}
+                            <span class="glyphicon glyphicon-remove" style="background-color: rgb(248, 41, 41)"></span>No</td>
+                            {% endif %}
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div><!-- container -->
+
+    
+
+    <script>
+        function frame1 (obj) {
+            
+            $('#myModalLabel').text($(obj).text());
+            $('#myModal').modal('show');
+            $('#myModal').on('hide.bs.modal',function(){
+                window.clearInterval();
+                if($('#myprogress').attr('style') != 'width:0%' || $('#myprogress').attr('style') != 'width:100.0%'){
+                    // $.ajax({
+                    //     url:'./stop',
+                    //     //终止运行
+                    // });
+                    // 删除未完成的MP3文件。
+                    //
+                    //
+                    location.reload();
+                }
+            });
+            // $('#myModal').off().on('hide','hide.bs.modal');
+
+            $(document).ready(function () {
+                $('#openexcel').click(function () {
+                    $.ajax({
+                    dataType:'text',
+                    url:"./openexcel",
+                    data:{'filename':$('#myModalLabel').text()},
+                    error: function(jqXHR,textStatus,errorThrown){
+                            alert("error:"+textStatus);
+                    },
+                    success:function(data){
+                            // alert(data);
+                    }
+                    
+                    });//ajax
+                });// openexcel
+                $('#openmp3dir').click(function(){
+                    $.ajax({
+                        url:'/openmp3dir',
+                        dataType:'text',
+                        // data:{'filename':$('#myModalLabel').text()},
+                        error: function(jqXHR,textStatus,errorThrown){
+                            alert("error:"+textStatus);
+                        },
+                    });//ajax
+                });//openmp3dir
+
+                $('#product').click(function(){
+                    $.ajax({
+                        dataType:"text",
+                        type:'GET',
+                        url:"./run",
+                        error: function(jqXHR,textStatus,errorThrown){
+                                alert("error:"+textStatus);
+                        },
+                        data:{"filename":$('#myModalLabel').text()},
+                        success:function(data){
+                            alert(data);
+                            window.clearInterval(t)
+                            location.reload();
+                        }
+                    });//product
+                    
+            
+            
+                    t = window.setInterval(function (){
+                        $.ajax({
+                            dataType:'text',
+                            url:"./processrate",
+                            error:function(info){
+                            console.log (info);
+                            },
+                            success:function(data){
+                                console.log(data);
+                                $("#myprogress").attr('style','width:'+data+'%');
+                            }
+                        });//ajax             
+                    },2000);//t
+                });//onclick
+            });//ready
+        }//frame1
+        
+        function frame2 (obj) {
+
+            var t = new Date();
+            var year = t.getFullYear();
+            var month = t.getMonth()+1;
+            var day = t.getDate();
+            console.log('day :'+day)
+            if(month<10){
+                month = '0'+month.toString();
+            }
+            if(day<10){
+                day = '0'+day.toString();
+            }
+            var time = year+'-'+month+'-'+day;
+            console.log('time',time);
+            $('#newfileName').val(time);
+            $('#myModal2').modal('show');
+        }
+
+        function newfile(){
+            newfileName = $('#newfileName').val();
+            if(newfileName != ''){
+                $.ajax({
+                    dataType:'text',
+                    url:'/new',
+                    data:{'newfileName':newfileName},
+                    error:function(info){
+                        alert(info)
+                    },
+                    success:function(info){
+                        alert(info)
+                    }
+                });
+            }else{
+                alert('新文件名不能为空!')
+            }
+        }
+
+        function delect_excel(){
+            name = $('#myModalLabel').text();
+            $.ajax({
+                dataType:'text',
+                url:'/delectexcel',
+                data:{'fileName':name}
+            });
+        }
+    </script>
+
+</body>
+
+</html>
