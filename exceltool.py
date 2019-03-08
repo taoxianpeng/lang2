@@ -11,7 +11,7 @@ from openpyxl import Workbook
 from openpyxl import load_workbook
 
 
-class iosys():
+class Exceltool():
     def __init__(self):
         self.cwd = getcwd()
         self.ntime = strftime("%Y-%m-%d", localtime())
