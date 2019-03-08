@@ -2,8 +2,9 @@ from flask import Flask
 from flask import render_template
 from flask import request as flask_request
 import os
-from exceltool import iosys
-from listingword import core
+from exceltool import Exceltool
+from core import Core
+
 
 app = Flask(__name__)
 
@@ -14,7 +15,7 @@ process_rate = 0 #进度条百分率
 can_run = True #终止运行标志
 
 @app.route('/')
-def index():
+def index(): #在主页上显示已存在的文件的信息
     # lists = []
     lists_xlsx = os.listdir(listdir)
     exist = 0
@@ -27,7 +28,7 @@ def index():
 # def existMP3(lists_xlsx):
 #     lists_mp3 = os.listdir(listmp3)
 
-def existMP3(file):
+def existMP3(file): #判断该文件的MP3音频文件是否已经生成了
     lists_mp3 = os.listdir(listmp3)
     name = set([])
     for fe in lists_mp3:
@@ -38,15 +39,15 @@ def existMP3(file):
             return 1
     return 0
 
-@app.route('/run',methods = ['GET'])
+@app.route('/run',methods = ['GET']) #开始下载译文、音频以及合成音频文件
 def run():
     
     fileName_mp3 = os.getcwd()+'/mp3/'+flask_request.values['filename']
     fileName_excel = os.getcwd()+'/excel/'+flask_request.values['filename']
 
-    iof = iosys()
+    iof = Exceltool()
     iof.setFileName(fileName_excel)
-    one = core()
+    one = Core()
     words = iof.readExcel_en()
     translation = iof.readExcel_zh()
 
@@ -131,7 +132,7 @@ def stop():
 @app.route('/new',methods=['GET'])
 def new():
     fileName = listdir+'/'+flask_request.values['newfileName']+'.xlsx'
-    io = iosys()
+    io = Exceltool()
     io.setFileName(fileName)
     info = io.createNew()
     return str(info)
