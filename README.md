@@ -1,4 +1,4 @@
-# lang2
+# 我爱听单词
 ## 配置启动环境：
 1. 安装flask
 pip install flask 
