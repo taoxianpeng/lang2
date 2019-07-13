@@ -1,3 +1,7 @@
+import config
+#设置环境变量
+config.setEnvVar() 
+
 from flask import Flask
 from flask import render_template
 from flask import request as flask_request
@@ -8,11 +12,15 @@ from core import Core
 
 app = Flask(__name__)
 
+
 listdir = os.getcwd()+"/excel"
 listmp3 = os.getcwd()+'/mp3'
 
 process_rate = 0 #进度条百分率
 can_run = True #终止运行标志
+
+#用默认浏览器打开首页
+os.system("start http://127.0.0.1:5000")
 
 @app.route('/')
 def index(): #在主页上显示已存在的文件的信息
