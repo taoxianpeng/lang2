@@ -1,1 +1,1 @@
-python e:\lang2\main.py
+python d:\Github\lang2\main.py
