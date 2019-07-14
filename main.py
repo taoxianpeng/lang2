@@ -144,9 +144,26 @@ def new():
     io.setFileName(fileName)
     info = io.createNew()
     return str(info)
-@app.route('/delectexcel')
-def delectexcel():
-    pass
+@app.route('/delect_excel_mp3')
+def delect_excel_mp3():
+    fileName[0] = os.getcwd()+'/excel/'+flask_request.values['fileName_d']
+    fileName[1] = os.getcwd()+'/mp3/'+flask_request.values['fileName_d']
+    return delect(fileName)
+
+@app.route('/delect_mp3')
+def delect_mp3():
+    fileName[0] = os.getcwd()+'/mp3/'+flask_request.values['fileName_d']
+    return delect(fileName)
+
+def delect(path):
+    for path_d in path:
+        if(os.path.exists(path_d)):
+            try:
+                os.remove(path)
+            except Exception as e:
+                print(e)
+                return e
+    return 'delect success'
 
 
 if __name__ == "__main__":
