@@ -7,7 +7,7 @@ class setEnvVar():
         ffmpeg_path = os.getcwd()+'\\ffmpeg\\bin'
         if os.path.exists(ffmpeg_path):
             try:
-                os.environ['PATH'] = ffmpeg_path
+                os.environ['PATH'] = os.environ['PATH']+';'+ffmpeg_path
                 print('[INFO] set ffmpeg path ok')
             except Exception as e :
                 print ('[INFO] '.join(e))

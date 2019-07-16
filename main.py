@@ -130,7 +130,8 @@ def openExcel():
 
 @app.route('/openmp3dir')
 def openMP3dir():
-    os.system('explorer {dir}'.format(dir=os.getcwd()+'\mp3'))
+    #os.system('explorer.exe {dir}'.format(dir=os.getcwd().join('\\mp3')))
+    os.system('explorer d:\\GitHub\\lang2\\mp3')
     return 'success'
 @app.route('/stop')
 def stop():

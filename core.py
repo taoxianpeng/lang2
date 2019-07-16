@@ -38,6 +38,8 @@ class Core():
             f.close()
 
 
+
+
     def getZH_translation(self, bs):
         # 获取中文解释
         tex = ''
@@ -91,6 +93,7 @@ class Core():
             api_key+'&client_secret='+secret_key
         token = requests_get(get_token_url)
         r = jsonLoads(token.text)
+        token.close()
         return r['access_token']
 
     def combine(self, song1, song2, song3):
