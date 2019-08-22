@@ -13,8 +13,8 @@ from core import Core
 app = Flask(__name__)
 
 
-listdir = os.getcwd()+"/excel"
-listmp3 = os.getcwd()+'/mp3'
+listdir = os.getcwd()+"\\excel"
+listmp3 = os.getcwd()+'\\mp3'
 
 process_rate = 0 #进度条百分率
 can_run = True #终止运行标志
@@ -115,7 +115,8 @@ def rate():
 
 @app.route('/delectmp3')
 def delectMP3():
-    pass
+    fileName = flask_request.values['fileName']
+    return removeMP3(fileName)
 
 @app.route('/delectall')
 def delectAll():
@@ -130,8 +131,7 @@ def openExcel():
 
 @app.route('/openmp3dir')
 def openMP3dir():
-    #os.system('explorer.exe {dir}'.format(dir=os.getcwd().join('\\mp3')))
-    os.system('explorer d:\\GitHub\\lang2\\mp3')
+    os.system('explorer '+listmp3)
     return 'success'
 @app.route('/stop')
 def stop():
@@ -147,9 +147,23 @@ def new():
     return str(info)
 @app.route('/delectexcel')
 def delectexcel():
-    pass
+    try:
+        os.remove(listdir+'/excel/'+flask_request.values['excelName']+'.xlsx')
+        return 'success!'
+    except Exception as identifier:
+        print(identifier)
+        return identifier
 
-
+def removeMP3(name):
+    for fileName in os.listdir(listmp3):
+        if str(fileName).find(name)>0:
+            try:
+                os.remove(fileName)
+                return "删除"+name+"+成功！"
+            except Exception as e:
+                print(e)
+                return e
+        
 if __name__ == "__main__":
     app.run(threaded=True)
 

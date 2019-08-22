@@ -298,7 +298,28 @@
             $.ajax({
                 dataType:'text',
                 url:'/delectexcel',
-                data:{'fileName':name}
+                data:{'excelName':name},
+                error: function(jqXHR,textStatus,errorThrown){
+                    alert("error:"+textStatus);
+                },
+                success:function(data){
+                    alert(data);
+                }
+            });
+        }
+
+        function delect_mp3(){
+            name = $('#myModalLabel').text();
+            $.ajax({
+                dataType:'text',
+                url:'/delectmp3',
+                data:{'fileName':name},
+                error: function(jqXHR,textStatus,errorThrown){
+                    alert("error:"+textStatus);
+                },
+                success:function(data){
+                    alert(data);
+                }
             });
         }
     </script>
