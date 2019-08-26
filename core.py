@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 from pydub import AudioSegment
 import socket
 
-socket.setdefaulttimeout(20)
+socket.setdefaulttimeout(3)
 
 '''
 core模块主要的功能就是负责爬取下载数据以及合成音频的功能
