@@ -29,6 +29,7 @@
                         <h4 class="modal-title" id="myModalLabel">
                             模态框（Modal）标题
                         </h4>
+                        <span></span>
                     </div>
                     <div class="modal-body">
                         <!-- 进度条 -->
@@ -229,8 +230,8 @@
                         },
                         data:{"filename":$('#myModalLabel').text()},
                         success:function(data){
-                            alert(data);
                             window.clearInterval(t)
+                            alert(data);
                             location.reload();
                         }
                     });//product
@@ -245,8 +246,8 @@
                             console.log (info);
                             },
                             success:function(data){
-                                console.log(data);
                                 $("#myprogress").attr('style','width:'+data+'%');
+                                console.log(data);
                             }
                         });//ajax             
                     },2000);//t
