@@ -8,14 +8,14 @@ from flask import request as flask_request
 import os
 from exceltool import Exceltool
 from core import Core
-
+import zip_mp3
+import math
 
 app = Flask(__name__)
 
 
 listdir = os.getcwd()+"\\excel"
 listmp3 = os.getcwd()+'\\mp3'
-
 process_rate = 0 #进度条百分率
 can_run = True #终止运行标志
 
@@ -49,9 +49,10 @@ def existMP3(file): #判断该文件的MP3音频文件是否已经生成了
 
 @app.route('/run',methods = ['GET']) #开始下载译文、音频以及合成音频文件
 def run():
-    
-    fileName_mp3 = os.getcwd()+'/mp3/'+flask_request.values['filename']
-    fileName_excel = os.getcwd()+'/excel/'+flask_request.values['filename']
+    file_name = flask_request.values['filename']
+    mp3_name = file_name.split('.')[0]
+    fileName_mp3 = os.getcwd()+'/mp3/'+mp3_name
+    fileName_excel = os.getcwd()+'/excel/'+file_name
 
     iof = Exceltool()
     iof.setFileName(fileName_excel)
@@ -102,9 +103,15 @@ def run():
         for i in range(len(words)):
             if not can_run: #当合成运行中时，前端发送取消信息，后端随时响应结束运行
                 return 'cancel'
-            one.launch(words[i], fileName_mp3.split('.')[0]+'-{num}'.format(num=(i//10)+1), translation[i])
+            one.launch(words[i], fileName_mp3+'-{num}'.format(num=(i//10)+1), translation[i])
             process_rate = round((i+1)/len(words)*100,1)
             print("*-"+str(process_rate))
+        
+        #将多个MP3的文件打包成一个MP3文件
+        
+        f=zip_mp3.Pack(fileName_mp3+'.mp3',[fileName_mp3+'-'+str(n)+'.mp3' for n in range(1,math.ceil(len(words)/10)+1)])
+        if f.packall() != 'ok':
+            print('[error]: pack all audio failed!!!')
         can_run = True #复位
         return 'accomplish'
 
@@ -115,7 +122,7 @@ def rate():
 
 @app.route('/delectmp3')
 def delectMP3():
-    fileName = flask_request.values['fileName']
+    fileName = flask_request.values['filename']
     return removeMP3(fileName)
 
 @app.route('/delectall')
