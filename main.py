@@ -13,7 +13,7 @@ import math
 
 app = Flask(__name__)
 
-
+audio_size = 5  #合成单个MP3的单词数量
 listdir = os.getcwd()+"\\excel"
 listmp3 = os.getcwd()+'\\mp3'
 process_rate = 0 #进度条百分率
@@ -29,7 +29,7 @@ def index(): #在主页上显示已存在的文件的信息
     exist = 0
     fileInfor = {}
     for file in lists_xlsx:
-        exist = existMP3(file.split('.')[0:-1])
+        exist = existMP3(file.split('.')[0]+'.mp3')
         fileInfor[file] = exist
     return render_template('index.html',fileInfo=fileInfor)
 
@@ -38,15 +38,19 @@ def index(): #在主页上显示已存在的文件的信息
 
 def existMP3(file): #判断该文件的MP3音频文件是否已经生成了
     lists_mp3 = os.listdir(listmp3)
-    name = set([])
-    for fe in lists_mp3:
-        string = fe.split('-')[0:-1]
-        name.add('-'.join(s for s in string))
-    for f in name:
-        if f == file[0]:
+    for f in lists_mp3:
+        if f == file:
             return 1
     return 0
-
+def delect_file(files):
+    try:
+        for f in files:
+            os.remove(f)
+        return 1
+    except FileNotFoundError as e:
+        print(e)
+        return 0
+    
 @app.route('/run',methods = ['GET']) #开始下载译文、音频以及合成音频文件
 def run():
     file_name = flask_request.values['filename']
@@ -103,15 +107,19 @@ def run():
         for i in range(len(words)):
             if not can_run: #当合成运行中时，前端发送取消信息，后端随时响应结束运行
                 return 'cancel'
-            one.launch(words[i], fileName_mp3+'-{num}'.format(num=(i//10)+1), translation[i])
+            one.launch(words[i], fileName_mp3+'-{num}'.format(num=(i//audio_size)+1), translation[i])
             process_rate = round((i+1)/len(words)*100,1)
             print("*-"+str(process_rate))
         
         #将多个MP3的文件打包成一个MP3文件
         
-        f=zip_mp3.Pack(fileName_mp3+'.mp3',[fileName_mp3+'-'+str(n)+'.mp3' for n in range(1,math.ceil(len(words)/10)+1)])
+        f=zip_mp3.Pack(fileName_mp3+'.mp3',[fileName_mp3+'-'+str(n)+'.mp3' for n in range(1,math.ceil(len(words)/audio_size)+1)])
         if f.packall() != 'ok':
             print('[error]: pack all audio failed!!!')
+        #删除MP3的临时文件
+        delec_info=delect_file([fileName_mp3+'-'+str(n)+'.mp3' for n in range(1,math.ceil(len(words)/audio_size)+1)])
+        if delec_info==0:
+            return '[error] file no found!'
         can_run = True #复位
         return 'accomplish'
 
