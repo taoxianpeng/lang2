@@ -53,6 +53,9 @@ def delect_file(files):
     
 @app.route('/run',methods = ['GET']) #开始下载译文、音频以及合成音频文件
 def run():
+    global process_rate
+    global can_run
+    
     file_name = flask_request.values['filename']
     mp3_name = file_name.split('.')[0]
     fileName_mp3 = os.getcwd()+'/mp3/'+mp3_name
@@ -85,12 +88,16 @@ def run():
 
     # 下载翻译
     if len(translation) == 0:
+        # global process_rate
+        process_rate = 0
+        i=1
         for word in words:
+            process_rate = round(i/len(words)*100,1)
+            i+=1
             html = one.getHtml(word)
             bs = one.getbs(html)
             zh = one.getZH_translation(bs)
             translation.append(zh)
-
         iof.writeExcel(translation)
     #检查单词的翻译 存在-1 并统计数量
     for i in range(len(words)):
@@ -101,8 +108,6 @@ def run():
         return '[WARNING]: 有{num}个单词没有翻译,需要手动填写!'.format(num=tl)
 
     else:
-        global process_rate
-        global can_run
         process_rate = 0
         for i in range(len(words)):
             if not can_run: #当合成运行中时，前端发送取消信息，后端随时响应结束运行
