@@ -1,18 +1,26 @@
+import config
+#设置环境变量
+config.setEnvVar() 
+
 from flask import Flask
 from flask import render_template
 from flask import request as flask_request
 import os
 from exceltool import Exceltool
 from core import Core
-
+import zip_mp3
+import math
 
 app = Flask(__name__)
 
-listdir = os.getcwd()+"/excel"
-listmp3 = os.getcwd()+'/mp3'
-
+audio_size = 5  #合成单个MP3的单词数量
+listdir = os.getcwd()+"\\excel"
+listmp3 = os.getcwd()+'\\mp3'
 process_rate = 0 #进度条百分率
 can_run = True #终止运行标志
+
+#用默认浏览器打开首页
+os.system("start http://127.0.0.1:5000")
 
 @app.route('/')
 def index(): #在主页上显示已存在的文件的信息
@@ -21,7 +29,7 @@ def index(): #在主页上显示已存在的文件的信息
     exist = 0
     fileInfor = {}
     for file in lists_xlsx:
-        exist = existMP3(file.split('.')[0:-1])
+        exist = existMP3(file.split('.')[0]+'.mp3')
         fileInfor[file] = exist
     return render_template('index.html',fileInfo=fileInfor)
 
@@ -30,20 +38,31 @@ def index(): #在主页上显示已存在的文件的信息
 
 def existMP3(file): #判断该文件的MP3音频文件是否已经生成了
     lists_mp3 = os.listdir(listmp3)
-    name = set([])
-    for fe in lists_mp3:
-        string = fe.split('-')[0:-1]
-        name.add('-'.join(s for s in string))
-    for f in name:
-        if f == file[0]:
+    for f in lists_mp3:
+        if f == file:
             return 1
     return 0
-
+def delect_file(files):
+    try:
+        for f in files:
+            print(f)
+            os.remove(f)
+    except FileNotFoundError as e:
+        print(e)
+        return e
+    else:
+        print('complete remove :'+f)
+        return 1
+    
 @app.route('/run',methods = ['GET']) #开始下载译文、音频以及合成音频文件
 def run():
+    global process_rate
+    global can_run
     
-    fileName_mp3 = os.getcwd()+'/mp3/'+flask_request.values['filename']
-    fileName_excel = os.getcwd()+'/excel/'+flask_request.values['filename']
+    file_name = flask_request.values['filename']
+    mp3_name = file_name.split('.')[0]
+    fileName_mp3 = os.getcwd()+'/mp3/'+mp3_name
+    fileName_excel = os.getcwd()+'/excel/'+file_name
 
     iof = Exceltool()
     iof.setFileName(fileName_excel)
@@ -72,12 +91,16 @@ def run():
 
     # 下载翻译
     if len(translation) == 0:
+        # global process_rate
+        process_rate = 0
+        i=1
         for word in words:
+            process_rate = math.ceil(i/len(words)*100)
+            i+=1
             html = one.getHtml(word)
             bs = one.getbs(html)
             zh = one.getZH_translation(bs)
             translation.append(zh)
-
         iof.writeExcel(translation)
     #检查单词的翻译 存在-1 并统计数量
     for i in range(len(words)):
@@ -88,17 +111,27 @@ def run():
         return '[WARNING]: 有{num}个单词没有翻译,需要手动填写!'.format(num=tl)
 
     else:
-        global process_rate
-        global can_run
         process_rate = 0
         for i in range(len(words)):
             if not can_run: #当合成运行中时，前端发送取消信息，后端随时响应结束运行
                 return 'cancel'
-            one.launch(words[i], fileName_mp3.split('.')[0]+'-{num}'.format(num=(i//10)+1), translation[i])
-            process_rate = round((i+1)/len(words)*100,1)
+            one.launch(words[i], fileName_mp3+'-{num}'.format(num=(i//audio_size)+1), translation[i])
+            process_rate = math.ceil((i+1)/len(words)*100)
             print("*-"+str(process_rate))
+        
+        #将多个MP3的文件打包成一个MP3文件
+        
+        fileName_list=[fileName_mp3+'-'+str(n)+'.mp3' for n in range(1,math.ceil(len(words)/audio_size)+1)]
+        print(fileName_list)
+        f=zip_mp3.Pack(fileName_mp3+'.mp3',fileName_list)
+
+        assert f.packall() == 'ok','pack mp3 failed!'
+
+        #删除MP3的临时文件
+        assert delect_file(fileName_list) == 1,'error deletct mp3'
+
         can_run = True #复位
-        return 'accomplish'
+        return 'complete everything!'
 
 @app.route('/processrate')
 def rate():
@@ -107,7 +140,9 @@ def rate():
 
 @app.route('/delectmp3')
 def delectMP3():
-    pass
+    fileName = [flask_request.values['fileName'].split('.')[0],]
+    info = delect_file(fileName)
+    return info
 
 @app.route('/delectall')
 def delectAll():
@@ -122,7 +157,7 @@ def openExcel():
 
 @app.route('/openmp3dir')
 def openMP3dir():
-    os.system('explorer {dir}'.format(dir=os.getcwd()+'\mp3'))
+    os.system('explorer '+listmp3)
     return 'success'
 @app.route('/stop')
 def stop():
@@ -138,9 +173,22 @@ def new():
     return str(info)
 @app.route('/delectexcel')
 def delectexcel():
-    pass
+    try:
+        os.remove(listdir+'/excel/'+flask_request.values['excelName']+'.xlsx')
+        return 'success!'
+    except Exception as identifier:
+        print(identifier)
+        return identifier
 
-
+def removeMP3(name):
+        global listmp3
+        try:
+            os.remove(listmp3+'/'+name+'.mp3')
+            return "remove "+name+"  success!"
+        except Exception as e:
+            print(e)
+            return e
+        
 if __name__ == "__main__":
     app.run(threaded=True)
 

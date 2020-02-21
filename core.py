@@ -8,6 +8,9 @@ from urllib.parse import quote
 from requests import get as requests_get
 from bs4 import BeautifulSoup
 from pydub import AudioSegment
+import socket
+
+socket.setdefaulttimeout(3)
 
 '''
 core模块主要的功能就是负责爬取下载数据以及合成音频的功能
@@ -20,6 +23,7 @@ class Core():
         self.word = word
         try:
             r = requests_get('http://www.iciba.com/'+self.word)
+            r.close()
             return r.text
         except Exception as e:
             print(e)
@@ -36,6 +40,9 @@ class Core():
         with open('en.mp3', 'wb') as f:
             f.write(mp3.content)
             f.close()
+        mp3.close()
+
+
 
 
     def getZH_translation(self, bs):
@@ -51,10 +58,11 @@ class Core():
                 span = li2.p.find_all('span')
                 for text in span:
                     tex += text.string
+                tex += ';'
         except Exception as e:
             print(e)
 
-        return tex
+        return tex[:-1]
 
     def getZN_mp3(self, usrToken, text):
         # tex	必填	合成的文本，使用UTF-8编码。小于512个中文字或者英文数字。（文本在百度服务器内转换为GBK后，长度必须小于1024字节）
@@ -81,6 +89,7 @@ class Core():
         with open('zh.mp3', 'wb') as f:
             f.write(zhmp3.content)
             f.close()
+        zhmp3.close()
 
     def __getToken(self):
         # 获取token认证
@@ -91,6 +100,7 @@ class Core():
             api_key+'&client_secret='+secret_key
         token = requests_get(get_token_url)
         r = jsonLoads(token.text)
+        token.close()
         return r['access_token']
 
     def combine(self, song1, song2, song3):

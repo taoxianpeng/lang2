@@ -11,12 +11,10 @@ pip install lxml
 5. 安装 requests
 pip install requests
 6. 安装 ffmpeg
-官网上下载windows版本，然后解压，在系统环境里面的path加入解压后ffmpeg的bin文件的路径
+官网上下载windows版本，然后解压到程序的根目录下
 7. 安装 pydub
 pip install pydub
 8. 在主程序当前目录下创建文件名为'excel'和'mp3'的两个文件夹
-9. 修改start.bat里的路径对应为主程序main.py的路径
-10. 从浏览器 127.0.0.1:5000 打开进入主界面
 
 ------------------
 - 完成
@@ -33,6 +31,5 @@ pip install pydub
 - 未完成
 
 1. “新建”，等主要功能未移植
-2. 签到功能
 3. 将单词从Excel文件 移植到 mysql数据库。
 4. 美化界面

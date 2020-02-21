@@ -29,6 +29,7 @@
                         <h4 class="modal-title" id="myModalLabel">
                             模态框（Modal）标题
                         </h4>
+                        <span></span>
                     </div>
                     <div class="modal-body">
                         <!-- 进度条 -->
@@ -66,9 +67,6 @@
                                 <li><a href="#">......</a></li>
                             </ul>
                             
-                            <button type="button" class="btn btn-primary">
-                                提交更改
-                            </button>
                         </div>
                     </div>
                 </div><!-- /.modal-content -->
@@ -113,9 +111,6 @@
                 <a href="#">首页</a>
             </li>
             <li>
-                <a href="#">更新计划</a>
-            </li>
-            <li>
                 <a href="#">关于</a>
             </li>
         </ul>
@@ -132,16 +127,12 @@
                     <p style="font-size: 17px">
                         至6月20日完成单词书第二遍
                         <br> 每日单词必须默写在单词本上
-                        <br> 每日完成任务后再网页上签到
                         <br>
                         <br> 坚持！
                         <br> 不抛弃，不放弃！
                         <br>
                     </p>
                     
-                    <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
-                        签到       
-                    </button>
             </div>
             <div class="col-xs-9">
                 <table class="table  table-hover">
@@ -229,8 +220,8 @@
                         },
                         data:{"filename":$('#myModalLabel').text()},
                         success:function(data){
-                            alert(data);
                             window.clearInterval(t)
+                            alert(data);
                             location.reload();
                         }
                     });//product
@@ -245,8 +236,8 @@
                             console.log (info);
                             },
                             success:function(data){
-                                console.log(data);
                                 $("#myprogress").attr('style','width:'+data+'%');
+                                console.log(data);
                             }
                         });//ajax             
                     },2000);//t
@@ -285,6 +276,7 @@
                     },
                     success:function(info){
                         alert(info)
+                        location.reload();
                     }
                 });
             }else{
@@ -297,7 +289,28 @@
             $.ajax({
                 dataType:'text',
                 url:'/delectexcel',
-                data:{'fileName':name}
+                data:{'excelName':name},
+                error: function(jqXHR,textStatus,errorThrown){
+                    alert("error:"+textStatus);
+                },
+                success:function(data){
+                    alert(data);
+                }
+            });
+        }
+
+        function delect_mp3(){
+            name = $('#myModalLabel').text();
+            $.ajax({
+                dataType:'text',
+                url:'/delectmp3',
+                data:{'fileName':name},
+                error: function(jqXHR,textStatus,errorThrown){
+                    alert("error:"+textStatus);
+                },
+                success:function(data){
+                    alert(data);
+                }
             });
         }
     </script>
