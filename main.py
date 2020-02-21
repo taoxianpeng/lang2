@@ -45,11 +45,14 @@ def existMP3(file): #判断该文件的MP3音频文件是否已经生成了
 def delect_file(files):
     try:
         for f in files:
+            print(f)
             os.remove(f)
-        return 1
     except FileNotFoundError as e:
         print(e)
-        return 0
+        return e
+    else:
+        print('complete remove :'+f)
+        return 1
     
 @app.route('/run',methods = ['GET']) #开始下载译文、音频以及合成音频文件
 def run():
@@ -92,7 +95,7 @@ def run():
         process_rate = 0
         i=1
         for word in words:
-            process_rate = round(i/len(words)*100,1)
+            process_rate = math.ceil(i/len(words)*100)
             i+=1
             html = one.getHtml(word)
             bs = one.getbs(html)
@@ -113,20 +116,22 @@ def run():
             if not can_run: #当合成运行中时，前端发送取消信息，后端随时响应结束运行
                 return 'cancel'
             one.launch(words[i], fileName_mp3+'-{num}'.format(num=(i//audio_size)+1), translation[i])
-            process_rate = round((i+1)/len(words)*100,1)
+            process_rate = math.ceil((i+1)/len(words)*100)
             print("*-"+str(process_rate))
         
         #将多个MP3的文件打包成一个MP3文件
         
-        f=zip_mp3.Pack(fileName_mp3+'.mp3',[fileName_mp3+'-'+str(n)+'.mp3' for n in range(1,math.ceil(len(words)/audio_size)+1)])
-        if f.packall() != 'ok':
-            print('[error]: pack all audio failed!!!')
+        fileName_list=[fileName_mp3+'-'+str(n)+'.mp3' for n in range(1,math.ceil(len(words)/audio_size)+1)]
+        print(fileName_list)
+        f=zip_mp3.Pack(fileName_mp3+'.mp3',fileName_list)
+
+        assert f.packall() == 'ok','pack mp3 failed!'
+
         #删除MP3的临时文件
-        delec_info=delect_file([fileName_mp3+'-'+str(n)+'.mp3' for n in range(1,math.ceil(len(words)/audio_size)+1)])
-        if delec_info==0:
-            return '[error] file no found!'
+        assert delect_file(fileName_list) == 1,'error deletct mp3'
+
         can_run = True #复位
-        return 'accomplish'
+        return 'complete everything!'
 
 @app.route('/processrate')
 def rate():
@@ -135,8 +140,9 @@ def rate():
 
 @app.route('/delectmp3')
 def delectMP3():
-    fileName = flask_request.values['filename']
-    return removeMP3(fileName)
+    fileName = [flask_request.values['fileName'].split('.')[0],]
+    info = delect_file(fileName)
+    return info
 
 @app.route('/delectall')
 def delectAll():
@@ -175,14 +181,13 @@ def delectexcel():
         return identifier
 
 def removeMP3(name):
-    for fileName in os.listdir(listmp3):
-        if str(fileName).find(name)>0:
-            try:
-                os.remove(fileName)
-                return "删除"+name+"+成功！"
-            except Exception as e:
-                print(e)
-                return e
+        global listmp3
+        try:
+            os.remove(listmp3+'/'+name+'.mp3')
+            return "remove "+name+"  success!"
+        except Exception as e:
+            print(e)
+            return e
         
 if __name__ == "__main__":
     app.run(threaded=True)
