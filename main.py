@@ -45,7 +45,7 @@ def existMP3(file): #判断该文件的MP3音频文件是否已经生成了
 def delect_file(files):
     try:
         for f in files:
-            print(f)
+            print('remove: '+f)
             os.remove(f)
     except FileNotFoundError as e:
         print(e)
@@ -63,6 +63,10 @@ def run():
     mp3_name = file_name.split('.')[0]
     fileName_mp3 = os.getcwd()+'/mp3/'+mp3_name
     fileName_excel = os.getcwd()+'/excel/'+file_name
+
+    #如果存在之前合成的音频，则先删除之前的音频，再重新合成
+    if os.path.exists:
+        remove_mp3(fileName_mp3)
 
     iof = Exceltool()
     iof.setFileName(fileName_excel)
@@ -138,11 +142,6 @@ def rate():
     print('***-'+str(process_rate))
     return str(process_rate)
 
-@app.route('/delectmp3')
-def delectMP3():
-    fileName = [flask_request.values['fileName'].split('.')[0],]
-    info = delect_file(fileName)
-    return info
 
 @app.route('/delectall')
 def delectAll():
@@ -171,16 +170,23 @@ def new():
     io.setFileName(fileName)
     info = io.createNew()
     return str(info)
-@app.route('/delectexcel')
-def delectexcel():
+@app.route('/delectExcelMp3')
+def delectExcelMp3():
+    name = flask_request.values['filename'].split('.')[0]
+    return ('excel:'+remove_excel(name)+', '+'mp3:'+remove_mp3(name))
+    
+def remove_excel(filename):
     try:
-        os.remove(listdir+'/excel/'+flask_request.values['excelName']+'.xlsx')
+        os.remove(listdir+'/'+filename+'.xlsx')
         return 'success!'
-    except Exception as identifier:
-        print(identifier)
-        return identifier
+    except Exception as e:
+        print(e)
+        return 'faild'
+@app.route('/delectmp3')
+def delectmp3():
+    return remove_mp3(flask_request.values['mp3Name'].split('.')[0]) 
 
-def removeMP3(name):
+def remove_mp3(name):
         global listmp3
         try:
             os.remove(listmp3+'/'+name+'.mp3')
