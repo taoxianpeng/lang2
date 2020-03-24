@@ -19,7 +19,7 @@
 
 <body>
     <!-- 模态框1（Modal） -->
-    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop=”static”>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -61,8 +61,8 @@
                                 <span class="sr-only">切换下拉菜单</span>
                             </button>
                             <ul class="dropdown-menu" role="menu">
-                                <li><a href="./delectmp3">删除MP3文件</a></li>
-                                <li><a href="#">删除Excel和MP3文件</a></li>
+                                <li><a onclick="delect_mp3()"> 删除MP3文件</a></li>
+                                <li><a onclick="delect_excel()">删除Excel及MP3文件</a></li>
                                 <li class="divider"></li>
                                 <li><a href="#">......</a></li>
                             </ul>
@@ -211,6 +211,7 @@
                 });//openmp3dir
 
                 $('#product').click(function(){
+                    $('#myModal').attr("data-backdrop","static");
                     $.ajax({
                         dataType:"text",
                         type:'GET',
@@ -238,6 +239,9 @@
                             success:function(data){
                                 $("#myprogress").attr('style','width:'+data+'%');
                                 console.log(data);
+                                if (date >= 100){
+                                    window.clearInterval(t)
+                                }
                             }
                         });//ajax             
                     },2000);//t
@@ -284,32 +288,34 @@
             }
         }
 
-        function delect_excel(){
+        function delect_excel_mp3(){
             name = $('#myModalLabel').text();
             $.ajax({
                 dataType:'text',
-                url:'/delectexcel',
+                url:'/delectExcelMp3',
                 data:{'excelName':name},
                 error: function(jqXHR,textStatus,errorThrown){
                     alert("error:"+textStatus);
                 },
                 success:function(data){
+                    location.reload();
                     alert(data);
                 }
             });
         }
-
+        
         function delect_mp3(){
             name = $('#myModalLabel').text();
             $.ajax({
                 dataType:'text',
                 url:'/delectmp3',
-                data:{'fileName':name},
-                error: function(jqXHR,textStatus,errorThrown){
-                    alert("error:"+textStatus);
+                data:{'mp3Name':name},
+                error: function(info){
+                    alert("error:"+info);
                 },
-                success:function(data){
-                    alert(data);
+                success:function(info){
+                    location.reload();
+                    alert(info);
                 }
             });
         }
