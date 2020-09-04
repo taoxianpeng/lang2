@@ -19,7 +19,7 @@ class Core():
     def __init__(self):
         self.word = ''
 
-    def getHtml(self, word):
+    def getHtml(self,word):
         self.word = word
         try:
             r = requests_get('http://www.iciba.com/'+self.word)
@@ -32,10 +32,8 @@ class Core():
         bs = BeautifulSoup(html, 'lxml')
         return bs
 
-    def getEN_mp3(self):
-
-        url = 'https://dict.youdao.com/dictvoice?audio={word}&type=2'.format(
-            word=self.word)
+    def getEN_mp3(self,):
+        url = 'https://dict.youdao.com/dictvoice?audio={word}&type=2'.format(word=self.word)
         mp3 = requests_get(url)
         with open('en.mp3', 'wb') as f:
             f.write(mp3.content)
@@ -49,19 +47,25 @@ class Core():
         # 获取中文解释
         tex = ''
         try:
-            ul = bs.find(class_='base-list switch_part')
+            ul = bs.find(class_='Mean_part__1RA2V')
             if ul is None:
                 print('[ERROR] {locate}没有找到翻译！'.format(locate=self.word))
                 return '-1'  # 返回 -1 便于控制器统计未找到的翻译
             li = ul.find_all('li')
-            for li2 in li:
-                span = li2.p.find_all('span')
-                for text in span:
-                    tex += text.string
-                tex += ';'
+            for div in li:
+                span = div.find_all('span')
+                # print(len(span))
+                if len(span)==1: return span[0].contents[0]
+                for text_list in span:
+                    # print(type(text_list))
+                    # print(text_list.contents)
+                    for t in text_list.contents:
+                        if t != ' ':
+                            tex += t  
         except Exception as e:
             print(e)
 
+        # print(tex)       
         return tex[:-1]
 
     def getZN_mp3(self, usrToken, text):
@@ -121,7 +125,7 @@ class Core():
             self.combine(fileName, 'word', fileName)
         print('合成完毕 ...',end = '\r')
     def launch(self, word, fileName, zh):
-        self.getEN_mp3()
+        #self.getEN_mp3()
         # zh = self.getZH_translation(bs)
         # 翻译从控制器中获取
         self.word = word
@@ -132,14 +136,14 @@ class Core():
 
 
 if __name__ == '__main__':
-    # one = core()
-    # words = input('输入单词:').split(' ')
-    # for word in words:
-    #     html = one.getHtml(word)
-    #     bs = one.getbs(html)
-    #     one.getEN_mp3(bs)
-    #     zh = one.getZH_translation(bs)
-    #     token = one.getToken()
-    #     one.getZN_mp3(token,zh)
-    #     one.combineToMP3()
-    pass
+    one = Core()
+    words = input('输入单词:').split(' ')
+    for word in words:
+        html = one.getHtml(word)
+        bs = one.getbs(html)
+        # one.getEN_mp3()
+        zh = one.getZH_translation(bs)
+        print(zh)
+        # token = one.getToken()
+        # one.getZN_mp3(token,zh)
+        # one.combineToMP3()
