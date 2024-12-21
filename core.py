@@ -74,7 +74,7 @@ class Core():
         # pit	选填	音调，取值0-9，默认为5中语调
         # vol	选填	音量，取值0-9，默认为5中音量
         # per	选填	发音人选择, 0为普通女声，1为普通男生，3为情感合成-度逍遥，4为情感合成-度丫丫，默认为普通女声
-        cuid = 'taoxianpeng123'
+        cuid = 'your cuid'
         tok = str(usrToken)
         tex = text
         url = 'http://tsn.baidu.com/text2audio'
@@ -94,8 +94,8 @@ class Core():
     def __getToken(self):
         # 获取token认证
         url_token = 'https://openapi.baidu.com/oauth/2.0/token'
-        api_key = 'R26ZZakxixaQbIDGrPkUwOTc'
-        secret_key = '10d76d90116385e126d95e1c277c538c'
+        api_key = 'your api_key'
+        secret_key = 'yout secret_key'
         get_token_url = url_token+'?'+'grant_type=client_credentials&client_id=' + \
             api_key+'&client_secret='+secret_key
         token = requests_get(get_token_url)
