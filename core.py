@@ -95,7 +95,7 @@ class Core():
         # 获取token认证
         url_token = 'https://openapi.baidu.com/oauth/2.0/token'
         api_key = 'your api_key'
-        secret_key = 'yout secret_key'
+        secret_key = 'your secret_key'
         get_token_url = url_token+'?'+'grant_type=client_credentials&client_id=' + \
             api_key+'&client_secret='+secret_key
         token = requests_get(get_token_url)
